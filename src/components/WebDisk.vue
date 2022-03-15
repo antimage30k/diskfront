@@ -59,7 +59,7 @@ import { ElMessage } from "element-plus";
 
 const log = console.log.bind(console, new Date().toLocaleDateString());
 const utc2local = function (datetime) {
-  return new Date(datetime + ' UTC').toLocaleString();
+  return new Date(datetime).toLocaleString();
 }
 
 const ajax = function (method, path, data, responseCallback) {
@@ -91,6 +91,8 @@ const ajax = function (method, path, data, responseCallback) {
   r.send(form);
 }
 
+const baseUrl = "http://localhost:4000"
+
 export default {
 
   data() {
@@ -114,7 +116,7 @@ export default {
 
   methods: {
     fetch() {
-      ajax("GET", "http://127.0.0.1:4000/disk/", null, (data) => {
+      ajax("GET", baseUrl + "/disk/", null, (data) => {
         this.files = data;
         for (let i = 0; i < this.files.length; i++) {
           let f = this.files[i];
@@ -133,7 +135,7 @@ export default {
     },
 
     deleteFile(id) {
-      ajax("DELETE", "http://127.0.0.1:4000/disk/delete/" + id, null, this.afterDelete);
+      ajax("DELETE", baseUrl + "/disk/delete/" + id, null, this.afterDelete);
 
     },
 
@@ -159,7 +161,7 @@ export default {
     },
 
     downloadFile(id) {
-      window.location.href = "http://127.0.0.1:4000/disk/download/" + id;
+      window.location.href = baseUrl + "/disk/download/" + id;
     },
 
     filter(files, search) {
