@@ -2,8 +2,8 @@
   <el-container>
     <el-aside width="150">
       <el-affix :offset="120">
-        <el-menu default-active="1" class="el-menu-vertical-demo">
-          <el-menu-item index="2">
+        <el-menu default-active="2" class="el-menu-vertical-demo">
+          <el-menu-item index="1" @click="loginDialogVisible = true">
             <el-icon>
               <user />
             </el-icon>
@@ -39,136 +39,95 @@
 
       <el-upload
         class="upload-demo"
-        action="http://127.0.0.1:4000/disk/upload/multi"
+        :action="baseUrl + '/disk/upload/multi'"
         multiple
         :on-success="afterUpload"
-        :data="{ 'size': size }"
-        :before-upload="getSize"
       >
         <el-button type="primary">Upload Files</el-button>
       </el-upload>
     </el-main>
   </el-container>
-</template>
 
+  <el-dialog
+  v-model="loginDialogVisible"
+  width="25%"
+  >
+  <Login />
+  </el-dialog>
+</template>
 
 
 <script>
 import { isString } from "@vueuse/shared";
 import { ElMessage } from "element-plus";
+import {ajax, log, baseUrl, utc2local} from './util.js'
+import Login from "./Login.vue";
 
-const log = console.log.bind(console, new Date().toLocaleDateString());
-const utc2local = function (datetime) {
-  return new Date(datetime).toLocaleString();
-}
-
-const ajax = function (method, path, data, responseCallback) {
-  // log('ajax request', method, path, data, responseCallback)
-  var r = new XMLHttpRequest()
-  r.open(method, path, true)
-  // response callback
-  r.onreadystatechange = function () {
-    if (r.readyState === 4) {
-      // log('ajax response data', r.response)
-      var r_data = JSON.parse(r.response)
-      responseCallback(r_data)
-    }
-  }
-
-  var form = new FormData()
-  for (var key in data) {
-    // 规范写法
-    if (!data.hasOwnProperty(key)) continue;
-    if (data[key] instanceof File) {
-      log('is file')
-      let f = data[key]
-      form.append(key, f)
-      form.append('size', f.size)
-    } else {
-      form.append(key, JSON.stringify(data[key].size))
-    }
-  }
-  r.send(form);
-}
-
-const baseUrl = "http://localhost:4000"
 
 export default {
-
-  data() {
-    return {
-      files: [],
-      size: Number,
-      search: "",
-    }
-  },
-
-  computed: {
-    filtered() {
-      return this.files.filter(
-        (data) => !this.search || data.name.toLowerCase().includes(this.search.toLowerCase()))
+    data() {
+        return {
+            files: [],
+            size: Number,
+            search: "",
+            baseUrl: baseUrl,
+            loginDialogVisible: false,
+        };
     },
-  },
-
-  mounted() {
-    this.fetch();
-  },
-
-  methods: {
-    fetch() {
-      ajax("GET", baseUrl + "/disk/", null, (data) => {
-        this.files = data;
-        for (let i = 0; i < this.files.length; i++) {
-          let f = this.files[i];
-          f.local_time = utc2local(f.create_time);
-        }
-      })
+    computed: {
+        filtered() {
+            return this.files.filter((data) => !this.search || data.name.toLowerCase().includes(this.search.toLowerCase()));
+        },
     },
-    afterUpload(res) {
-      log(res);
-      if (isString(res)) {
-        ElMessage.error(res)
-      } else {
-        res.local_time = utc2local(res.create_time)
-        this.files.push(res)
-      }
+    mounted() {
+        this.fetch();
     },
-
-    deleteFile(id) {
-      ajax("DELETE", baseUrl + "/disk/delete/" + id, null, this.afterDelete);
-
+    methods: {
+        fetch() {
+            ajax("GET", baseUrl + "/disk/", null, (data) => {
+                this.files = data;
+                for (let i = 0; i < this.files.length; i++) {
+                    let f = this.files[i];
+                    f.local_time = utc2local(f.create_time);
+                }
+            });
+        },
+        afterUpload(res) {
+            log(res);
+            if (isString(res)) {
+                ElMessage.error(res);
+            }
+            else {
+                res.local_time = utc2local(res.create_time);
+                this.files.push(res);
+            }
+        },
+        deleteFile(id) {
+            ajax("DELETE", baseUrl + "/disk/delete/" + id, null, this.afterDelete);
+        },
+        afterDelete(response) {
+            log(response);
+            let id = response.id;
+            this.files.splice(this.files.findIndex((f) => {
+                return f.id === id;
+            }), 1);
+        },
+        getSize(file) {
+            // log(file)
+            this.size = file.size;
+            // log(this.size)
+        },
+        uuid(id) {
+            log(id);
+        },
+        downloadFile(id) {
+            window.location.href = baseUrl + "/disk/download/" + id;
+        },
+        filter(files, search) {
+            return files.filter((data) => !search.value || data.name.toLowerCase().includes(search.value.toLowerCase()));
+        },
     },
-
-    afterDelete(response) {
-      log(response);
-      let id = response.id;
-      this.files.splice(
-        this.files.findIndex((f) => {
-          return f.id === id;
-        }), 1,
-      );
-    },
-
-    getSize(file) {
-      // log(file)
-      this.size = file.size;
-      // log(this.size)
-
-    },
-
-    uuid(id) {
-      log(id)
-    },
-
-    downloadFile(id) {
-      window.location.href = baseUrl + "/disk/download/" + id;
-    },
-
-    filter(files, search) {
-      return files.filter(
-        (data) => !search.value || data.name.toLowerCase().includes(search.value.toLowerCase()))
-    },
-  }
+    components: { Login }
 }
 </script>
 
