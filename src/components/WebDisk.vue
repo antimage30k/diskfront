@@ -3,7 +3,7 @@
     <el-aside width="150">
       <el-affix :offset="120">
         <el-menu default-active="1" class="el-menu-vertical-demo">
-          <el-menu-item index="1">
+          <el-menu-item index="2">
             <el-icon>
               <user />
             </el-icon>
