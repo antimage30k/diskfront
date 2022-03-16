@@ -32,7 +32,8 @@
     
 </template>
 
-<script>import { ajax, baseUrl } from "./util"
+<script>import { ElMessage } from "element-plus"
+import { jsonAjax, baseUrl } from "./util"
 
 
 export default {
@@ -46,9 +47,12 @@ export default {
     },
 
     methods:{
+        onRegister(){
+            jsonAjax('POST', baseUrl + '/register', this.form, (res)=>{ElMessage(res)});
+        },
         onLogin(){
-            ajax('POST', baseUrl + '/login', )
-        }
+            jsonAjax('POST', baseUrl + '/login', this.form, (res)=>{ElMessage(res)});
+        },
     }
 }
 </script>

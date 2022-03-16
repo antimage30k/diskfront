@@ -33,3 +33,20 @@ export const ajax = function (method, path, data, responseCallback) {
 }
 
 export const baseUrl = "http://localhost:4000"
+
+
+export const jsonAjax = function (method, path, data, responseCallback) {
+  // log('ajax request', method, path, data, responseCallback)
+  var r = new XMLHttpRequest()
+  r.open(method, path, true)
+  // response callback
+  r.onreadystatechange = function () {
+    if (r.readyState === 4) {
+      // log('ajax response data', r.response)
+      var res = JSON.parse(r.response)
+      responseCallback(res);
+    }
+  }
+  r.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+  r.send(JSON.stringify(data));
+}
