@@ -48,11 +48,8 @@
     </el-main>
   </el-container>
 
-  <el-dialog
-  v-model="loginDialogVisible"
-  width="25%"
-  >
-  <Login />
+  <el-dialog v-model="loginDialogVisible" width="25%">
+    <LoginItem />
   </el-dialog>
 </template>
 
@@ -60,74 +57,61 @@
 <script>
 import { isString } from "@vueuse/shared";
 import { ElMessage } from "element-plus";
-import {ajax, log, baseUrl, utc2local} from './util.js'
-import Login from "./Login.vue";
-
+import { ajax, log, baseUrl, utc2local } from './util.js'
+import LoginItem from "./LoginItem.vue";
 
 export default {
-    data() {
-        return {
-            files: [],
-            size: Number,
-            search: "",
-            baseUrl: baseUrl,
-            loginDialogVisible: false,
-        };
+  data() {
+    return {
+      files: [],
+      search: "",
+      baseUrl: baseUrl,
+      loginDialogVisible: false,
+    };
+  },
+  computed: {
+    filtered() {
+      return this.files.filter((data) => !this.search || data.name.toLowerCase().includes(this.search.toLowerCase()));
     },
-    computed: {
-        filtered() {
-            return this.files.filter((data) => !this.search || data.name.toLowerCase().includes(this.search.toLowerCase()));
-        },
+  },
+  mounted() {
+    this.fetch();
+  },
+  methods: {
+    fetch() {
+      ajax("GET", baseUrl + "/disk/", null, (data) => {
+        this.files = data;
+        for (let i = 0; i < this.files.length; i++) {
+          let f = this.files[i];
+          f.local_time = utc2local(f.create_time);
+        }
+      });
     },
-    mounted() {
-        this.fetch();
+    afterUpload(res) {
+      log(res);
+      if (isString(res)) {
+        ElMessage.error(res);
+      }
+      else {
+        res.local_time = utc2local(res.create_time);
+        this.files.push(res);
+      }
     },
-    methods: {
-        fetch() {
-            ajax("GET", baseUrl + "/disk/", null, (data) => {
-                this.files = data;
-                for (let i = 0; i < this.files.length; i++) {
-                    let f = this.files[i];
-                    f.local_time = utc2local(f.create_time);
-                }
-            });
-        },
-        afterUpload(res) {
-            log(res);
-            if (isString(res)) {
-                ElMessage.error(res);
-            }
-            else {
-                res.local_time = utc2local(res.create_time);
-                this.files.push(res);
-            }
-        },
-        deleteFile(id) {
-            ajax("DELETE", baseUrl + "/disk/delete/" + id, null, this.afterDelete);
-        },
-        afterDelete(response) {
-            log(response);
-            let id = response.id;
-            this.files.splice(this.files.findIndex((f) => {
-                return f.id === id;
-            }), 1);
-        },
-        getSize(file) {
-            // log(file)
-            this.size = file.size;
-            // log(this.size)
-        },
-        uuid(id) {
-            log(id);
-        },
-        downloadFile(id) {
-            window.location.href = baseUrl + "/disk/download/" + id;
-        },
-        filter(files, search) {
-            return files.filter((data) => !search.value || data.name.toLowerCase().includes(search.value.toLowerCase()));
-        },
+    deleteFile(id) {
+      ajax("DELETE", baseUrl + "/disk/delete/" + id, null, this.afterDelete);
     },
-    components: { Login }
+    afterDelete(response) {
+      log(response);
+      let id = response.id;
+      this.files.splice(this.files.findIndex((f) => {
+        return f.id === id;
+      }), 1);
+    },
+    downloadFile(id) {
+      window.location.href = baseUrl + "/disk/download/" + id;
+    },
+  },
+  components: { LoginItem }
 }
 </script>
 

@@ -1,6 +1,6 @@
 export const log = console.log.bind(console, new Date().toLocaleDateString());
-export const utc2local = function (datetime) {
-  return new Date(datetime).toLocaleString();
+export const utc2local = function (timestamp) {
+  return new Date(timestamp * 1000).toLocaleString();
 }
 
 export const ajax = function (method, path, data, responseCallback) {
