@@ -63,7 +63,7 @@
 <script>
 import { isString } from "@vueuse/shared";
 import { ElMessage } from "element-plus";
-import { ajax, log, utc2local, store, getCurrentUser } from './util.js'
+import { jsonAjax, log, utc2local, store, getCurrentUser } from './util.js'
 import LoginItem from "./LoginItem.vue";
 import { BaseUrl } from "./constants.js";
 
@@ -91,7 +91,7 @@ export default {
   },
   methods: {
     fetch() {
-      ajax("GET", BaseUrl + "/api/disk/", null, (data) => {
+      jsonAjax("GET", BaseUrl + "/api/disk/", null, (data) => {
         this.files = data;
         for (let i = 0; i < this.files.length; i++) {
           let f = this.files[i];

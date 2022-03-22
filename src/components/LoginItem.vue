@@ -39,7 +39,8 @@
     </el-tabs>
 </template>
 
-<script>import { ElMessage } from "element-plus"
+<script>
+import { ElMessage } from "element-plus"
 import { jsonAjax, store, setUser, logout } from "./util"
 import { BaseUrl } from "./constants"
 
