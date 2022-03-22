@@ -25,6 +25,7 @@
                 status-icon
                 :model="form"
                 :rules="rules"
+                ref="ruleFormRef"
                 style="max-width: 360px"
             >
                 <el-form-item label="Name" prop="username">
@@ -46,9 +47,8 @@
 
 <script>
 import { ElMessage } from "element-plus"
-import { jsonAjax, store, setUser, logout, validatePassword, validateUsername } from "./util"
+import { jsonAjax, store, setUser, logout, validatePassword, validateUsername, log } from "./util"
 import { BaseUrl } from "./constants"
-
 export default {
     data() {
         return {
@@ -69,9 +69,17 @@ export default {
 
     methods: {
         onRegister() {
-            jsonAjax('POST', BaseUrl + '/api/register', this.form, (res) => {
-                ElMessage.success(res.message);
+            if (!this.$refs.ruleFormRef) {
+                return;
+            }
+            this.$refs.ruleFormRef.validate((valid) => {
+                if (valid) {
+                    jsonAjax('POST', BaseUrl + '/api/register', this.form, (res) => {
+                        ElMessage.success(res.message);
+                    });
+                }
             });
+
         },
         onLogin() {
             jsonAjax('POST', BaseUrl + '/api/login', this.form, (res) => {
@@ -83,6 +91,8 @@ export default {
         validateName(rule, value, callback) {
             if (!validateUsername(value)) {
                 callback(new Error('Invalid Username'))
+            } else {
+                callback();
             }
         },
         validatePass(rule, value, callback) {
