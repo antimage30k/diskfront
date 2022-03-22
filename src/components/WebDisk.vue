@@ -2,9 +2,9 @@
   <el-container>
     <el-aside width="150">
       <el-affix :offset="120">
-        <span :title="userInfo.username">{{userInfo.username}}</span>
+        <span :title="userInfo.username">{{ userInfo.username }}</span>
         <el-menu default-active="2" class="el-menu-vertical-demo">
-          <el-menu-item index="1" @click="loginDialogVisible = true">
+          <el-menu-item index="1" @click="openLoginDialog">
             <el-icon>
               <user />
             </el-icon>
@@ -35,7 +35,7 @@
               size="small"
               type="danger"
               @click.prevent="deleteFile(scope.row.id)"
-              :disabled="! userInfo.isAdmin"
+              :disabled="!userInfo.isAdmin"
             >Delete</el-button>
           </template>
         </el-table-column>
@@ -55,7 +55,7 @@
   </el-container>
 
   <el-dialog v-model="loginDialogVisible" width="25%">
-    <LoginItem />
+    <LoginItem @close-login-dialog="closeLoginDialog" />
   </el-dialog>
 </template>
 
@@ -81,8 +81,8 @@ export default {
     filtered() {
       return this.files.filter((data) => !this.search || data.name.toLowerCase().includes(this.search.toLowerCase()));
     },
-    disableDelete(){
-      return ! this.userInfo.isAdmin;
+    disableDelete() {
+      return !this.userInfo.isAdmin;
     },
   },
   mounted() {
@@ -100,7 +100,6 @@ export default {
       });
     },
     afterUpload(res) {
-      log(res);
       if (isString(res)) {
         ElMessage.error(res);
       }
@@ -113,7 +112,6 @@ export default {
       ajax("DELETE", BaseUrl + "/api/disk/delete/" + id, null, this.afterDelete);
     },
     afterDelete(response) {
-      log(response);
       let id = response.id;
       this.files.splice(this.files.findIndex((f) => {
         return f.id === id;
@@ -121,6 +119,12 @@ export default {
     },
     downloadFile(id) {
       window.location.href = BaseUrl + "/api/disk/download/" + id;
+    },
+    openLoginDialog() {
+      this.loginDialogVisible = true;
+    },
+    closeLoginDialog() {
+      this.loginDialogVisible = false;
     },
   },
   components: { LoginItem }

@@ -23,7 +23,7 @@ export const jsonAjax = function (method, path, data, responseCallback) {
       }
     }
   };
-  
+
   r.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
   r.send(JSON.stringify(data));
 }
@@ -52,4 +52,23 @@ export const getCurrentUser = function () {
   jsonAjax("GET", BaseUrl + '/api/current_user', null, (res) => {
     setUser(res);
   });
+}
+
+export const validateUsername = function (username) {
+  const length = username.length;
+  if (length < 2 || length > 10) {
+    return false;
+  }
+  // 字母开头，字母或数字结尾，只能包含字母、数字和下划线
+  const reg = /^[a-zA-Z]{1}[0-9a-zA-Z_]*[0-9a-zA-Z]{1}$/
+  return reg.test(username);
+}
+
+export const validatePassword = function(password){
+  const length = password.length;
+  if (length <6){
+    return false;
+  }
+  const reg = /^\S+$/
+  return reg.test(password)
 }
