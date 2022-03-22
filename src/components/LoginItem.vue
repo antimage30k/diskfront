@@ -40,8 +40,8 @@
 </template>
 
 <script>import { ElMessage } from "element-plus"
-import { jsonAjax, baseUrl } from "./util"
-
+import { jsonAjax, store, setUser, logout } from "./util"
+import { BaseUrl } from "./constants"
 
 export default {
     data() {
@@ -50,17 +50,23 @@ export default {
                 username: '',
                 password: '',
             },
+            userInfo: store.userInfo,
         }
     },
 
     methods: {
         onRegister() {
-            jsonAjax('POST', baseUrl + '/register', this.form, (res) => { ElMessage(res) });
+            jsonAjax('POST', BaseUrl + '/api/register', this.form, (res) => {
+                ElMessage(res.message);
+            });
         },
         onLogin() {
-            jsonAjax('POST', baseUrl + '/login', this.form, (res) => { ElMessage(res) });
+            jsonAjax('POST', BaseUrl + '/api/login', this.form, (res) => {
+                ElMessage(res.message);
+                setUser(res.data);
+            });
         },
-    }
+    },
 }
 </script>
 <style>

@@ -2,6 +2,7 @@
   <el-container>
     <el-aside width="150">
       <el-affix :offset="120">
+        <span :title="userInfo.username">{{userInfo.username}}</span>
         <el-menu default-active="2" class="el-menu-vertical-demo">
           <el-menu-item index="1" @click="loginDialogVisible = true">
             <el-icon>
@@ -30,7 +31,12 @@
           </template>
           <template #default="scope">
             <el-button size="small" @click.prevent="downloadFile(scope.row.id)">Download</el-button>
-            <el-button size="small" type="danger" @click.prevent="deleteFile(scope.row.id)">Delete</el-button>
+            <el-button
+              size="small"
+              type="danger"
+              @click.prevent="deleteFile(scope.row.id)"
+              :disabled="! userInfo.isAdmin"
+            >Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -39,7 +45,7 @@
 
       <el-upload
         class="upload-demo"
-        :action="baseUrl + '/disk/upload/multi'"
+        :action="baseUrl + '/api/disk/upload/multi'"
         multiple
         :on-success="afterUpload"
       >
@@ -57,29 +63,35 @@
 <script>
 import { isString } from "@vueuse/shared";
 import { ElMessage } from "element-plus";
-import { ajax, log, baseUrl, utc2local } from './util.js'
+import { ajax, log, utc2local, store, getCurrentUser } from './util.js'
 import LoginItem from "./LoginItem.vue";
+import { BaseUrl } from "./constants.js";
 
 export default {
   data() {
     return {
       files: [],
       search: "",
-      baseUrl: baseUrl,
+      baseUrl: BaseUrl,
       loginDialogVisible: false,
+      userInfo: store.userInfo,
     };
   },
   computed: {
     filtered() {
       return this.files.filter((data) => !this.search || data.name.toLowerCase().includes(this.search.toLowerCase()));
     },
+    disableDelete(){
+      return ! this.userInfo.isAdmin;
+    },
   },
   mounted() {
+    getCurrentUser();
     this.fetch();
   },
   methods: {
     fetch() {
-      ajax("GET", baseUrl + "/disk/", null, (data) => {
+      ajax("GET", BaseUrl + "/api/disk/", null, (data) => {
         this.files = data;
         for (let i = 0; i < this.files.length; i++) {
           let f = this.files[i];
@@ -98,7 +110,7 @@ export default {
       }
     },
     deleteFile(id) {
-      ajax("DELETE", baseUrl + "/disk/delete/" + id, null, this.afterDelete);
+      ajax("DELETE", BaseUrl + "/api/disk/delete/" + id, null, this.afterDelete);
     },
     afterDelete(response) {
       log(response);
@@ -108,7 +120,7 @@ export default {
       }), 1);
     },
     downloadFile(id) {
-      window.location.href = baseUrl + "/disk/download/" + id;
+      window.location.href = BaseUrl + "/api/disk/download/" + id;
     },
   },
   components: { LoginItem }
