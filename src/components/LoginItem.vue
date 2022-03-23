@@ -72,8 +72,8 @@ export default {
             if (!this.$refs.ruleFormRef) {
                 return;
             }
-            this.$refs.ruleFormRef.validate((valid) => {
-                if (valid) {
+            this.$refs.ruleFormRef.validate((result) => {
+                if (result) {
                     jsonAjax('POST', BaseUrl + '/api/register', this.form, (res) => {
                         ElMessage.success(res.message);
                     });

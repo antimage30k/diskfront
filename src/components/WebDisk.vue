@@ -4,11 +4,11 @@
       <el-affix :offset="120">
         <span :title="userInfo.username">{{ userInfo.username }}</span>
         <el-menu default-active="2" class="el-menu-vertical-demo">
-          <el-menu-item index="1" @click="openLoginDialog">
+          <el-menu-item index="1" @click="handleLogin">
             <el-icon>
               <user />
             </el-icon>
-            <span>LOGIN</span>
+            <span>{{ loginSpan }}</span>
           </el-menu-item>
           <el-menu-item index="2">
             <el-icon>
@@ -63,9 +63,9 @@
 <script>
 import { isString } from "@vueuse/shared";
 import { ElMessage } from "element-plus";
-import { jsonAjax, log, utc2local, store, getCurrentUser } from './util.js'
+import { jsonAjax, log, utc2local, store, getCurrentUser, logout } from './util.js'
 import LoginItem from "./LoginItem.vue";
-import { BaseUrl } from "./constants.js";
+import { BaseUrl, DefaultUser } from "./constants.js";
 
 export default {
   data() {
@@ -80,6 +80,13 @@ export default {
   computed: {
     filtered() {
       return this.files.filter((data) => !this.search || data.name.toLowerCase().includes(this.search.toLowerCase()));
+    },
+    loginSpan() {
+      if (this.userInfo.userId === DefaultUser.Guest) {
+        return "LOGIN";
+      } else {
+        return "LOGOUT";
+      }
     },
     disableDelete() {
       return !this.userInfo.isAdmin;
@@ -120,11 +127,21 @@ export default {
     downloadFile(id) {
       window.location.href = BaseUrl + "/api/disk/download/" + id;
     },
+    handleLogin() {
+      if (this.userInfo.userId === DefaultUser.Guest) {
+        this.openLoginDialog();
+      } else {
+        this.onLogout();
+      }
+    },
     openLoginDialog() {
       this.loginDialogVisible = true;
     },
     closeLoginDialog() {
       this.loginDialogVisible = false;
+    },
+    onLogout() {
+      logout();
     },
   },
   components: { LoginItem }

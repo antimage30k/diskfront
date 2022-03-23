@@ -32,7 +32,7 @@ export const store = {
   userInfo: reactive({
     isAdmin: ref(false),
     userId: ref(-1),
-    username: ref('guest'),
+    username: ref('游客'),
   }),
 }
 
@@ -44,8 +44,9 @@ export const setUser = function (data) {
 }
 
 export const logout = function () {
-  store.userInfo.isAdmin = false;
-  store.userInfo.userId = -1;
+  jsonAjax('DELETE', BaseUrl + '/api/logout', null, (res) => {
+    setUser(res);
+  });
 }
 
 export const getCurrentUser = function () {
@@ -64,9 +65,9 @@ export const validateUsername = function (username) {
   return reg.test(username);
 }
 
-export const validatePassword = function(password){
+export const validatePassword = function (password) {
   const length = password.length;
-  if (length <6){
+  if (length < 6) {
     return false;
   }
   const reg = /^\S+$/
