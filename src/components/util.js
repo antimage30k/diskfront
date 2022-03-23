@@ -33,6 +33,7 @@ export const store = {
     isAdmin: ref(false),
     userId: ref(-1),
     username: ref('游客'),
+    avatar: ref(''),
   }),
 }
 
@@ -40,6 +41,7 @@ export const setUser = function (data) {
   store.userInfo.isAdmin = data.isAdmin;
   store.userInfo.userId = data.userId;
   store.userInfo.username = data.username;
+  store.userInfo.avatar = data.avatar;
   log("UserInfo", data);
 }
 

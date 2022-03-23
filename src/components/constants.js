@@ -5,3 +5,5 @@ export const DefaultUser = {
 
 // export const BaseUrl = 'http://localhost:5000/'
 export const BaseUrl = '';
+
+export const defaultAvatar = '/avatar/default-1.png';

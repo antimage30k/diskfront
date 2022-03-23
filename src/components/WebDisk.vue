@@ -1,14 +1,21 @@
 <template>
   <el-container>
-    <el-aside width="150">
+    <el-aside width="10%">
       <el-affix :offset="120">
+        <div>
+          <el-avatar :size="128" fit="cover" :src="getAvatar" />
+        </div>
         <span :title="userInfo.username">{{ userInfo.username }}</span>
+        <br />
+        <br />
         <el-menu default-active="2" class="el-menu-vertical-demo">
-          <el-menu-item index="1" @click="handleLogin">
+          <el-menu-item index="1" @click="handleLogin" :style="{ color: loginTextColor }">
             <el-icon>
               <user />
             </el-icon>
-            <span>{{ loginSpan }}</span>
+            <span>
+              <b>{{ loginSpan }}</b>
+            </span>
           </el-menu-item>
           <el-menu-item index="2">
             <el-icon>
@@ -65,7 +72,7 @@ import { isString } from "@vueuse/shared";
 import { ElMessage } from "element-plus";
 import { jsonAjax, log, utc2local, store, getCurrentUser, logout } from './util.js'
 import LoginItem from "./LoginItem.vue";
-import { BaseUrl, DefaultUser } from "./constants.js";
+import { BaseUrl, DefaultUser, defaultAvatar } from "./constants.js";
 
 export default {
   data() {
@@ -75,16 +82,26 @@ export default {
       baseUrl: BaseUrl,
       loginDialogVisible: false,
       userInfo: store.userInfo,
+      loginTextColor: '#67C23A',
     };
   },
   computed: {
     filtered() {
       return this.files.filter((data) => !this.search || data.name.toLowerCase().includes(this.search.toLowerCase()));
     },
+    getAvatar() {
+      if (!this.userInfo.avatar) {
+        return defaultAvatar;
+      } else {
+        return this.userInfo.avatar;
+      }
+    },
     loginSpan() {
       if (this.userInfo.userId === DefaultUser.Guest) {
+        this.loginTextColor = '#67C23A';
         return "LOGIN";
       } else {
+        this.loginTextColor = '#F56C6C';
         return "LOGOUT";
       }
     },
@@ -116,7 +133,7 @@ export default {
       }
     },
     deleteFile(id) {
-      ajax("DELETE", BaseUrl + "/api/disk/delete/" + id, null, this.afterDelete);
+      jsonAjax("DELETE", BaseUrl + "/api/disk/delete/" + id, null, this.afterDelete);
     },
     afterDelete(response) {
       let id = response.id;
