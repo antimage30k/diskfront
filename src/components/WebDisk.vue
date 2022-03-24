@@ -3,7 +3,7 @@
     <el-aside width="10%">
       <el-affix :offset="120">
         <div>
-          <el-avatar :size="128" fit="cover" :src="getAvatar" />
+          <AvatarItem />
         </div>
         <span :title="userInfo.username">{{ userInfo.username }}</span>
         <br />
@@ -72,6 +72,7 @@ import { isString } from "@vueuse/shared";
 import { ElMessage } from "element-plus";
 import { jsonAjax, log, utc2local, store, getCurrentUser, logout } from './util.js'
 import LoginItem from "./LoginItem.vue";
+import AvatarItem from "./AvatarItem.vue";
 import { BaseUrl, DefaultUser, defaultAvatar } from "./constants.js";
 
 export default {
@@ -161,7 +162,7 @@ export default {
       logout();
     },
   },
-  components: { LoginItem }
+  components: { LoginItem, AvatarItem }
 }
 </script>
 
