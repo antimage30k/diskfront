@@ -7,3 +7,5 @@ export const DefaultUser = {
 export const BaseUrl = '';
 
 export const defaultAvatar = '/avatar/default-1.png';
+
+export const unsettedNum = -1;

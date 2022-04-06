@@ -31,7 +31,7 @@
 
 <script>
 import { ElMessage } from "element-plus";
-import { BaseUrl } from './constants.js';
+import { BaseUrl, unsettedNum } from './constants.js';
 import { store, jsonAjax, log } from './util.js'
 export default {
     data() {
@@ -39,7 +39,7 @@ export default {
             userInfo: store.userInfo,
             avatarDialogVisible: false,
             items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-            selected: -1,
+            selected: unsettedNum,
         }
     },
     computed: {
@@ -59,11 +59,11 @@ export default {
             // div.style.backgroundColor = "#409eff";
         },
         changeAvatar() {
-            if (this.selected === -1) {
+            if (this.selected === unsettedNum) {
                 ElMessage.error("Please Select One Avatar");
                 return;
             }
-            jsonAjax("PATCH", BaseUrl + '/api/avatar', { avatar: this.selected }, (res) => {
+            jsonAjax("PATCH", BaseUrl + '/api/avatar/set', { avatar: this.selected }, (res) => {
                 log(res);
                 this.store.avatar = res.avatar;
             });
