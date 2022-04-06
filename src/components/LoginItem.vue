@@ -11,7 +11,7 @@
                     <el-input v-model="form.username" />
                 </el-form-item>
                 <el-form-item label="Password">
-                    <el-input v-model="form.password" />
+                    <el-input v-model="form.password" type="password" />
                 </el-form-item>
                 <el-form-item>
                     <el-button type="success" round @click="onLogin">Login</el-button>
