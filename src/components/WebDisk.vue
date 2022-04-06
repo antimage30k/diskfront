@@ -61,7 +61,7 @@
     </el-main>
   </el-container>
 
-  <el-dialog v-model="loginDialogVisible" width="25%">
+  <el-dialog v-model="loginDialogVisible" width="480px">
     <LoginItem @close-login-dialog="closeLoginDialog" />
   </el-dialog>
 </template>
