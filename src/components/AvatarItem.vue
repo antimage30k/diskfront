@@ -1,7 +1,7 @@
 <template>
     <el-avatar
         class="avatar-img"
-        :size="128"
+        :size="160"
         fit="cover"
         :src="userAvatar"
         @click.prevent="switchAvatarDialogVisible"
@@ -11,12 +11,12 @@
         <div class="grid-container">
             <div
                 class="grid-item"
-                v-for="item in items"
+                v-for="item in defaultAvatars"
                 :key="item"
                 :id="'item-' + item"
                 :style="{ backgroundColor: item === selected ? '#409eff' : '#FFFFFF' }"
             >
-                <el-image :src="userAvatar" fit="cover" @click.prevent="chooseAvatar(item)" />
+                <el-image :src="item" fit="cover" @click.prevent="chooseAvatar(item)" />
             </div>
         </div>
         <template #footer>
@@ -31,20 +31,26 @@
 
 <script>
 import { ElMessage } from "element-plus";
-import { BaseUrl, unsettedNum } from './constants.js';
+import { BaseUrl, unsettedNum, defaultAvatarList, defaultAvatar } from './constants.js';
 import { store, jsonAjax, log } from './util.js'
 export default {
     data() {
         return {
             userInfo: store.userInfo,
             avatarDialogVisible: false,
-            items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
             selected: unsettedNum,
         }
     },
     computed: {
         userAvatar() {
-            return this.userInfo.avatar ? this.userInfo.avatar : '/avatar/default-1.png';
+            return this.userInfo.avatar ? this.userInfo.avatar : defaultAvatar;
+        },
+        defaultAvatars() {
+            const arr = [];
+            for (let i = 0; i < defaultAvatarList.length; i++) {
+                arr.push('/avatar/' + defaultAvatarList[i]);
+            }
+            return arr;
         }
     },
     methods: {
@@ -86,19 +92,13 @@ export default {
 }
 .grid-container {
     display: grid;
-    grid-template-columns: auto auto auto auto;
-    grid-gap: 20px;
+    grid-template-columns: auto auto auto auto auto auto;
+    grid-gap: 0px;
     background-color: #ffffff;
     padding: 20px;
 }
-
-.grid-container > div {
-    background-color: rgba(255, 255, 255, 0.8);
-    text-align: center;
-    padding: 20px 0;
-    font-size: 30px;
-}
 .grid-item {
-    border: #409eff solid 1px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px 10px;
 }
 </style>
