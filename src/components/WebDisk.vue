@@ -31,6 +31,15 @@
       <el-table :data="filtered" stripe align="center">
         <el-table-column prop="local_time" label="上传时间" width="200" />
         <el-table-column prop="name" label="文件名" width="400" />
+        <el-table-column label="公开" width="100">
+          <template #default="scope">
+            <el-switch
+              :model-value="scope.row.share"
+              :disabled="notAdminOrUploader(scope.row.uploader)"
+              @click.prevent="changeShare(scope.row.id, scope.row.share, scope.row.uploader)"
+            />
+          </template>
+        </el-table-column>
         <el-table-column prop="size" label="大小" width="100" />
         <el-table-column width="200">
           <template #header>
@@ -42,7 +51,7 @@
               size="small"
               type="danger"
               @click.prevent="deleteFile(scope.row.id)"
-              :disabled="!userInfo.isAdmin"
+              :disabled="notAdminOrUploader(scope.row.uploader)"
             >Delete</el-button>
           </template>
         </el-table-column>
@@ -56,7 +65,7 @@
         multiple
         :on-success="afterUpload"
       >
-        <el-button type="primary">Upload Files</el-button>
+        <el-button type="primary" :disabled="userInfo.userId == guestId">Upload Files</el-button>
       </el-upload>
     </el-main>
   </el-container>
@@ -84,6 +93,7 @@ export default {
       loginDialogVisible: false,
       userInfo: store.userInfo,
       loginTextColor: '#67C23A',
+      guestId: DefaultUser.Guest,
     };
   },
   computed: {
@@ -105,9 +115,6 @@ export default {
         this.loginTextColor = '#F56C6C';
         return "LOGOUT";
       }
-    },
-    disableDelete() {
-      return !this.userInfo.isAdmin;
     },
   },
   mounted() {
@@ -160,6 +167,17 @@ export default {
     },
     onLogout() {
       logout();
+    },
+    notAdminOrUploader(uploaderId) {
+      return !this.userInfo.isAdmin && uploaderId !== this.userInfo.userId;
+    },
+    changeShare(fileId, currentShare, uploaderId) {
+      if (this.notAdminOrUploader(uploaderId)) {
+        return;
+      }
+      jsonAjax('POST', this.baseUrl + '/api/disk/share/set', { id: fileId, share: !currentShare }, (res) => {
+        this.files[this.files.findIndex((f) => f.id === fileId)].share = res.share;
+      })
     },
   },
   components: { LoginItem, AvatarItem }

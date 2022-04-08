@@ -71,7 +71,7 @@ export default {
             }
             jsonAjax("PATCH", BaseUrl + '/api/avatar/set', { avatar: this.selected }, (res) => {
                 log(res);
-                this.store.avatar = res.avatar;
+                store.userInfo.avatar = res.avatar;
             });
             this.switchAvatarDialogVisible();
         },
