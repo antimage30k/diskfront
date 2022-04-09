@@ -79,7 +79,7 @@
 <script>
 import { isString } from "@vueuse/shared";
 import { ElMessage } from "element-plus";
-import { jsonAjax, log, utc2local, store, getCurrentUser, logout } from './util.js'
+import { jsonAjax, log, utc2local, store, getCurrentUser, setUser } from './util.js'
 import LoginItem from "./LoginItem.vue";
 import AvatarItem from "./AvatarItem.vue";
 import { BaseUrl, DefaultUser, defaultAvatar } from "./constants.js";
@@ -163,10 +163,14 @@ export default {
       this.loginDialogVisible = true;
     },
     closeLoginDialog() {
+      this.fetch();
       this.loginDialogVisible = false;
     },
     onLogout() {
-      logout();
+      jsonAjax('DELETE', BaseUrl + '/api/logout', null, (res) => {
+        setUser(res);
+        this.fetch();
+      });
     },
     notAdminOrUploader(uploaderId) {
       return !this.userInfo.isAdmin && uploaderId !== this.userInfo.userId;

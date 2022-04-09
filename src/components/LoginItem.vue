@@ -47,7 +47,7 @@
 
 <script>
 import { ElMessage } from "element-plus"
-import { jsonAjax, store, setUser, logout, validatePassword, validateUsername, log } from "./util"
+import { jsonAjax, store, setUser, validatePassword, validateUsername, log } from "./util"
 import { BaseUrl } from "./constants"
 export default {
     data() {

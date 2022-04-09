@@ -45,12 +45,6 @@ export const setUser = function (data) {
   log("UserInfo", data);
 }
 
-export const logout = function () {
-  jsonAjax('DELETE', BaseUrl + '/api/logout', null, (res) => {
-    setUser(res);
-  });
-}
-
 export const getCurrentUser = function () {
   jsonAjax("GET", BaseUrl + '/api/current_user', null, (res) => {
     setUser(res);

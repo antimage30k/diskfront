@@ -4,7 +4,7 @@
         :size="160"
         fit="cover"
         :src="userAvatar"
-        @click.prevent="switchAvatarDialogVisible"
+        @click.prevent="userInfo.userId !== -1 && switchAvatarDialogVisible()"
     />
 
     <el-dialog v-model="avatarDialogVisible" title="Choose Your Avatar" width="1080px">
