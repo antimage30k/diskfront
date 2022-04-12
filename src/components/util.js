@@ -57,15 +57,12 @@ export const validateUsername = function (username) {
     return false;
   }
   // 字母开头，字母或数字结尾，只能包含字母、数字和下划线
-  const reg = /^[a-zA-Z]{1}[0-9a-zA-Z_]*[0-9a-zA-Z]{1}$/
+  const reg = /^[a-zA-Z]{1}\w*[0-9a-zA-Z]{1}$/
   return reg.test(username);
 }
 
 export const validatePassword = function (password) {
-  const length = password.length;
-  if (length < 6) {
-    return false;
-  }
-  const reg = /^\S+$/
-  return reg.test(password)
+  const reg1 = /^(\d+|[a-zA-Z]+)$/
+  const reg2 = /^\S{6,20}$/
+  return !reg1.test(password) && reg2.test(password)
 }
