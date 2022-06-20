@@ -33,38 +33,27 @@
         <el-table-column prop="name" label="文件名" width="400" />
         <el-table-column label="公开" width="100">
           <template #default="scope">
-            <el-switch
-              :model-value="scope.row.share"
-              :disabled="notAdminOrUploader(scope.row.uploader)"
-              @click.prevent="changeShare(scope.row.id, scope.row.share, scope.row.uploader)"
-            />
+            <el-switch :model-value="scope.row.share" :disabled="notAdminOrUploader(scope.row.uploader)"
+              @click.prevent="changeShare(scope.row.id, scope.row.share, scope.row.uploader)" />
           </template>
         </el-table-column>
         <el-table-column prop="size" label="大小" width="100" />
-        <el-table-column width="200">
+        <el-table-column width="256">
           <template #header>
             <el-input size="small" placeholder="Type to search" v-model="search" />
           </template>
           <template #default="scope">
+            <el-button size="small" type="success" @click.prevent="copyLink(scope.row.id)">Copy</el-button>
             <el-button size="small" @click.prevent="downloadFile(scope.row.id)">Download</el-button>
-            <el-button
-              size="small"
-              type="danger"
-              @click.prevent="deleteFile(scope.row.id)"
-              :disabled="notAdminOrUploader(scope.row.uploader)"
-            >Delete</el-button>
+            <el-button size="small" type="danger" @click.prevent="deleteFile(scope.row.id)"
+              :disabled="notAdminOrUploader(scope.row.uploader)">Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
       <br />
       <br />
 
-      <el-upload
-        class="upload-demo"
-        :action="baseUrl + '/api/disk/upload/multi'"
-        multiple
-        :on-success="afterUpload"
-      >
+      <el-upload class="upload-demo" :action="baseUrl + '/api/disk/upload/multi'" multiple :on-success="afterUpload">
         <el-button type="primary" :disabled="userInfo.userId == guestId">Upload Files</el-button>
       </el-upload>
     </el-main>
@@ -148,6 +137,13 @@ export default {
       this.files.splice(this.files.findIndex((f) => {
         return f.id === id;
       }), 1);
+    },
+    copyLink(id) {
+      let link = window.location.origin + '/api/disk/download/' + id;
+      navigator.clipboard.writeText(link).then(
+        function(){},
+        function(){}
+      );
     },
     downloadFile(id) {
       window.location.href = BaseUrl + "/api/disk/download/" + id;
