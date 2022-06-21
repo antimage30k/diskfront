@@ -139,11 +139,17 @@ export default {
       }), 1);
     },
     copyLink(id) {
-      let link = window.location.origin + '/api/disk/download/' + id;
-      navigator.clipboard.writeText(link).then(
-        function(){},
-        function(){}
-      );
+      const link = window.location.origin + '/api/disk/download/' + id;
+      // navigator.clipboard.writeText(link).then(
+      //   function(){},
+      //   function(){}
+      // );
+      const aux = document.createElement("input");
+      aux.setAttribute("value", link);
+      document.body.appendChild(aux);
+      aux.select();
+      document.execCommand('copy');
+      document.body.removeChild(aux);
     },
     downloadFile(id) {
       window.location.href = BaseUrl + "/api/disk/download/" + id;
