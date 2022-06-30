@@ -1,24 +1,21 @@
 <template>
-    <el-avatar
-        class="avatar-img"
-        :size="160"
-        fit="cover"
-        :src="userAvatar"
-        @click.prevent="userInfo.userId !== -1 && switchAvatarDialogVisible()"
-    />
+    <el-avatar class="avatar-img" :size="160" fit="cover" :src="userAvatar"
+        @click.prevent="userInfo.userId !== -1 && switchAvatarDialogVisible()" />
 
-    <el-dialog v-model="avatarDialogVisible" title="Choose Your Avatar" width="1080px">
-        <div class="grid-container">
-            <div
-                class="grid-item"
-                v-for="item in defaultAvatars"
-                :key="item"
-                :id="'item-' + item"
-                :style="{ backgroundColor: item === selected ? '#409eff' : '#FFFFFF' }"
-            >
-                <el-image :src="item" fit="cover" @click.prevent="chooseAvatar(item)" />
-            </div>
-        </div>
+    <el-dialog v-model="avatarDialogVisible" width="1080px">
+        <el-tabs type="card">
+            <el-tab-pane label="Choose Avatar">
+                <div class="grid-container">
+                    <div class="grid-item" v-for="item in defaultAvatars" :key="item" :id="'item-' + item"
+                        :style="{ backgroundColor: item === selected ? '#409eff' : '#FFFFFF' }">
+                        <el-image :src="item" fit="cover" @click.prevent="chooseAvatar(item)" />
+                    </div>
+                </div>
+            </el-tab-pane>
+            <el-tab-pane label="Avatar Link">
+                <el-input v-model="selected" placeholder="Input Image Link"></el-input>
+            </el-tab-pane>
+        </el-tabs>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click.prevent="switchAvatarDialogVisible">Cancel</el-button>
@@ -38,7 +35,7 @@ export default {
         return {
             userInfo: store.userInfo,
             avatarDialogVisible: false,
-            selected: unsettedNum,
+            selected: "",
         }
     },
     computed: {
@@ -65,7 +62,7 @@ export default {
             // div.style.backgroundColor = "#409eff";
         },
         changeAvatar() {
-            if (this.selected === unsettedNum) {
+            if (this.selected === "") {
                 ElMessage.error("Please Select One Avatar");
                 return;
             }
@@ -87,9 +84,11 @@ export default {
     border-radius: 50%;
     transition: all 1.2s;
 }
+
 .avatar-img:hover {
     transform: rotate(360deg);
 }
+
 .grid-container {
     display: grid;
     grid-template-columns: auto auto auto auto auto auto;
@@ -97,6 +96,7 @@ export default {
     background-color: #ffffff;
     padding: 20px;
 }
+
 .grid-item {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 10px 10px;
