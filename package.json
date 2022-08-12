@@ -10,6 +10,7 @@
   "dependencies": {
     "@element-plus/icons": "^0.0.11",
     "@vue/composition-api": "^1.4.9",
+    "axios": "^0.27.2",
     "element-plus": "^2.0.5",
     "vue": "^3.2.25"
   },

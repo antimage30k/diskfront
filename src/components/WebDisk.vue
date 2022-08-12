@@ -53,8 +53,16 @@
       <br />
       <br />
 
-      <el-upload class="upload-demo" :action="baseUrl + '/api/disk/upload/multi'" multiple :on-success="afterUpload">
-        <el-button type="primary" :disabled="userInfo.userId == guestId">Upload Files</el-button>
+      <!-- <el-progress :stroke-width="20" :text-inside="true" :percentage="uploadProgress" /> -->
+
+      <el-upload class="upload-demo" drag :action="baseUrl + '/api/disk/upload/multi'" multiple
+        :disabled="userInfo.userId == guestId" :on-success="afterUpload">
+        <el-icon class="el-icon--upload">
+          <upload-filled />
+        </el-icon>
+        <div class="el-upload__text">
+          Drop file here or <em>click to upload</em>
+        </div>
       </el-upload>
     </el-main>
   </el-container>
@@ -72,6 +80,7 @@ import { jsonAjax, log, utc2local, store, getCurrentUser, setUser } from './util
 import LoginItem from "./LoginItem.vue";
 import AvatarItem from "./AvatarItem.vue";
 import { BaseUrl, DefaultUser, defaultAvatar } from "./constants.js";
+import axios from 'axios'
 
 export default {
   data() {
@@ -109,6 +118,7 @@ export default {
   mounted() {
     getCurrentUser();
     this.fetch();
+    // this.bindDragEvents();
   },
   methods: {
     fetch() {
@@ -185,6 +195,45 @@ export default {
         this.files[this.files.findIndex((f) => f.id === fileId)].share = res.share;
       })
     },
+    bindDragEvents() {
+      const body = document.body;
+      body.addEventListener("dragenter", e => {
+        e.preventDefault();
+      })
+      body.addEventListener("dragover", e => {
+        e.preventDefault();
+      })
+      body.addEventListener("dragleave", e => {
+        e.preventDefault();
+      })
+      body.addEventListener("drop", e => {
+        e.preventDefault();
+        const fileList = e.dataTransfer.files;
+        if (fileList !== null && fileList.length > 0) {
+          for (let i = 0; i < fileList.length; i++) {
+            let form = new FormData();
+            form.append("file", fileList[i]);
+            axios.post(
+              this.baseUrl + '/api/disk/upload/multi',
+              form,
+              {
+                onUploadProgress: progress => {
+                  this.uploadProgress = Number(
+                    ((progress.loaded / progress.total) * 100).toFixed(2)
+                  );
+                }
+              }
+            ).
+              then((response) => {
+                this.afterUpload(response.data);
+              }).
+              catch(function (error) {
+                console.log(error);
+              })
+          }
+        }
+      })
+    }
   },
   components: { LoginItem, AvatarItem }
 }
