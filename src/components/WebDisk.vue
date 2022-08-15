@@ -53,7 +53,7 @@
       <br />
       <br />
 
-      <!-- <el-progress :stroke-width="20" :text-inside="true" :percentage="uploadProgress" /> -->
+      <el-progress :stroke-width="15" :text-inside="true" :percentage="uploadProgress" />
 
       <el-upload class="upload-demo" drag :action="baseUrl + '/api/disk/upload/multi'" multiple
         :disabled="userInfo.userId == guestId" :on-success="afterUpload">
@@ -92,6 +92,7 @@ export default {
       userInfo: store.userInfo,
       loginTextColor: '#67C23A',
       guestId: DefaultUser.Guest,
+      uploadProgress: 0,
     };
   },
   computed: {
@@ -118,7 +119,7 @@ export default {
   mounted() {
     getCurrentUser();
     this.fetch();
-    // this.bindDragEvents();
+    this.bindPasteEvent();
   },
   methods: {
     fetch() {
@@ -195,42 +196,41 @@ export default {
         this.files[this.files.findIndex((f) => f.id === fileId)].share = res.share;
       })
     },
-    bindDragEvents() {
-      const body = document.body;
-      body.addEventListener("dragenter", e => {
+    bindPasteEvent() {
+      document.addEventListener("paste", (e) => {
         e.preventDefault();
-      })
-      body.addEventListener("dragover", e => {
-        e.preventDefault();
-      })
-      body.addEventListener("dragleave", e => {
-        e.preventDefault();
-      })
-      body.addEventListener("drop", e => {
-        e.preventDefault();
-        const fileList = e.dataTransfer.files;
-        if (fileList !== null && fileList.length > 0) {
-          for (let i = 0; i < fileList.length; i++) {
-            let form = new FormData();
-            form.append("file", fileList[i]);
-            axios.post(
-              this.baseUrl + '/api/disk/upload/multi',
-              form,
-              {
-                onUploadProgress: progress => {
-                  this.uploadProgress = Number(
-                    ((progress.loaded / progress.total) * 100).toFixed(2)
-                  );
-                }
-              }
-            ).
-              then((response) => {
-                this.afterUpload(response.data);
-              }).
-              catch(function (error) {
-                console.log(error);
-              })
+        let clipboardData = e.clipboardData || e.originalEvent.clipboardData;
+        let file = null;
+        if (clipboardData && clipboardData.items) {
+          let items = clipboardData.items;
+          for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") !== -1) {
+              file = items[i].getAsFile();
+              break;
+            }
           }
+        }
+        if (file !== null) {
+          let form = new FormData();
+          form.append("file", file, "capture-" + Date.now() + file.name.slice(file.name.indexOf('.')));
+          axios.post(
+            this.baseUrl + '/api/disk/upload/multi',
+            form,
+            {
+              onUploadProgress: progress => {
+                this.uploadProgress = Number(
+                  ((progress.loaded / progress.total) * 100).toFixed(2)
+                );
+              }
+            }
+          ).
+            then((response) => {
+              this.afterUpload(response.data);
+              this.uploadProgress = 0;
+            }).
+            catch(function (error) {
+              console.log(error);
+            })
         }
       })
     }
